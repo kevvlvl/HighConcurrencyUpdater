@@ -5,10 +5,10 @@ import {CustomerEntity} from "./customerEntity";
 import {mapCustomerDtoToEntity} from "./customerMapper";
 
 const conf: SqlConfig = {
-    user: 'sa',
+    user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     server: process.env.DB_SERVER!,
-    database: 'app',
+    database: process.env.DB_DATABASE,
     options: {
         encrypt: true,
         trustServerCertificate: true,
@@ -41,6 +41,7 @@ async function updateCustomer(id: number, dto: CustomerDto): Promise<void> {
                 SET firstName = @firstName,
                     lastName = @lastName,
                     country = @country,
+                    rowVersion = rowVersion + 1
                 WHERE id = @id
                     AND rowVersion = @rowVersion`);
 

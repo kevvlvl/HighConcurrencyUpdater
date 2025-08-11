@@ -4,7 +4,8 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "build": "node_modules/.bin/tsc"
+    "build": "tsc -p .",
+    "start": "node dist/server.js"
   },
   "dependencies": {
     "@types/express": "^5.0.3",
@@ -13,7 +14,7 @@
     "mssql": "^11.0.1"
   },
   "devDependencies": {
-    "typescript": "^5.5.3"
+    "typescript": "^5.9.2"
   },
   "private": true
 }

@@ -21,3 +21,8 @@ create table Customer(
     rowVersion BIGINT DEFAULT 1
 );
 ```
+
+## TODO
+
+Add Post operation to create (without primary key or version in dto)
+Then test with Put

@@ -36,5 +36,5 @@ server.put('/api/customer/:id', async (req: Request<{ id: number }>, res: Respon
 })
 
 server.listen(port, () => {
-    console.log("Server listening on port ', port");
+    console.log("Server listening on port", port);
 })
