@@ -1,0 +1,19 @@
+{
+  "name": "api-svc",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "node_modules/.bin/tsc"
+  },
+  "dependencies": {
+    "@types/express": "^5.0.3",
+    "@types/mssql": "^9.1.7",
+    "express": "^5.1.0",
+    "mssql": "^11.0.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.3"
+  },
+  "private": true
+}
