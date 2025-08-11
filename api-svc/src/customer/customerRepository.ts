@@ -5,10 +5,10 @@ import {CustomerEntity} from "./customerEntity";
 import {mapCustomerDtoToEntity} from "./customerMapper";
 
 const conf: SqlConfig = {
-    user: process.env.DB_USER,
+    user: 'sa',
     password: process.env.DB_PASSWORD,
     server: process.env.DB_SERVER!,
-    database: process.env.DB_DATABASE,
+    database: 'app',
     options: {
         encrypt: true,
         trustServerCertificate: true,
