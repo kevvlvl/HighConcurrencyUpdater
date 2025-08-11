@@ -15,9 +15,55 @@ const conf: SqlConfig = {
     }
 }
 
+async function createCustomer(dto: CustomerDto): Promise<void> {
+
+    let entity: CustomerEntity = mapCustomerDtoToEntity(0, dto);
+
+    let pool: ConnectionPool | undefined;
+    let transaction: Transaction | undefined;
+
+    try {
+
+        pool = await sql.connect(conf);
+        transaction = new Transaction(pool);
+
+        await transaction.begin(ISOLATION_LEVEL.SNAPSHOT);
+
+        const r = new SqlRequest(transaction);
+        r.input('firstName', NVarChar(100), entity.firstName);
+        r.input('lastName', NVarChar(100), entity.lastName);
+        r.input('country', NVarChar(50), entity.country);
+
+        const result = await r.query(`
+            INSERT INTO Customer(firstName, lastName, country)
+            VALUES(@firstName, @lastName, @country)`);
+
+        await transaction.commit();
+
+        if (result.rowsAffected[0] != 1) {
+            throw {
+                code: 'INSERT_ERROR',
+                message: 'Failed to add Customer'
+            }
+        }
+
+    } catch(err) {
+
+        if(transaction) {
+            try {
+                await transaction.rollback();
+            } catch(transactionError) {
+                console.error('Error trying to rollback transaction: ', transactionError);
+            }
+        }
+
+        throw err;
+    }
+}
+
 async function updateCustomer(id: number, dto: CustomerDto): Promise<void> {
 
-    let entity: CustomerEntity = mapCustomerDtoToEntity(dto);
+    let entity: CustomerEntity = mapCustomerDtoToEntity(id, dto);
 
     let pool: ConnectionPool | undefined;
     let transaction: Transaction | undefined;
@@ -67,4 +113,4 @@ async function updateCustomer(id: number, dto: CustomerDto): Promise<void> {
     }
 }
 
-export { updateCustomer }
+export { createCustomer, updateCustomer }

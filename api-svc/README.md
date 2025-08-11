@@ -13,6 +13,9 @@ podman run -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=LocalPass123" -p 1433:1433 -
 create database app
 go
 
+alter database app
+    set ALLOW_SNAPSHOT_ISOLATION on;
+
 create table Customer(
     id INT IDENTITY(1, 1) PRIMARY KEY,
     firstName NVARCHAR(100),
@@ -24,5 +27,18 @@ create table Customer(
 
 ## TODO
 
-Add Post operation to create (without primary key or version in dto)
-Then test with Put
+### Create a customer
+
+```shell
+curl -X POST localhost:3000/api/customer \
+  -H "Content-Type: application/json" \
+  -d '{"firstName": "Kev", "lastName": "Power", "country": "Canada"}'
+```
+
+### Update a customer
+
+```shell
+curl -X PUT localhost:3000/api/customer/1 \
+  -H "Content-Type: application/json" \
+  -d '{"firstName": "Kev", "lastName": "SUPER POWER", "country": "Canada", "version": "1"}'
+```

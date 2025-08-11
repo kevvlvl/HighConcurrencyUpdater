@@ -1,5 +1,5 @@
 import express, {Express, Request, Response} from 'express';
-import {updateCustomer} from "./customer/customerRepository";
+import {createCustomer, updateCustomer} from "./customer/customerRepository";
 import {CustomerDto} from "./customer/customerDto";
 
 console.log('Happy developing ✨')
@@ -8,6 +8,24 @@ const server: Express = express();
 const port: string = process.env.PORT || '3000';
 
 server.use(express.json());
+
+server.post('/api/customer', async (req: Request<{}>, res: Response) => {
+
+    let reqData: CustomerDto = req.body as CustomerDto;
+
+    try {
+        await createCustomer(reqData);
+        res.sendStatus(201);
+    } catch(err: any) {
+
+        console.log(err);
+
+        res.status(500).json({
+            error: 'Internal Server Error',
+            details: err.message
+        })
+    }
+})
 
 server.put('/api/customer/:id', async (req: Request<{ id: number }>, res: Response) => {
 

@@ -11,9 +11,9 @@ function mapCustomerEntityToDto(entity: CustomerEntity): CustomerDto {
     }
 }
 
-function mapCustomerDtoToEntity(dto: CustomerDto): CustomerEntity {
+function mapCustomerDtoToEntity(id: number, dto: CustomerDto): CustomerEntity {
     return {
-        id: dto.id,
+        id: id,
         firstName: dto.firstName,
         lastName: dto.lastName,
         country: dto.country,
