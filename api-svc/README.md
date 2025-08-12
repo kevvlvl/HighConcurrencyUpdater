@@ -25,7 +25,13 @@ create table Customer(
 );
 ```
 
-## TODO
+## Endpoints
+
+### Get Customer
+
+```shell
+curl localhost:3000/api/customer/1
+```
 
 ### Create a customer
 

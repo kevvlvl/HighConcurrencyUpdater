@@ -1,4 +1,7 @@
-import sql, {config as SqlConfig, ConnectionPool, Transaction, Request as SqlRequest, ISOLATION_LEVEL, BigInt, NVarChar} from 'mssql';
+import sql, {
+    config as SqlConfig, ConnectionPool, Transaction, Request as SqlRequest, ISOLATION_LEVEL, BigInt, NVarChar,
+    IResult
+} from 'mssql';
 
 import {CustomerDto} from "./customerDto";
 import {CustomerEntity} from "./customerEntity";
@@ -13,6 +16,33 @@ const conf: SqlConfig = {
         encrypt: true,
         trustServerCertificate: true,
     }
+}
+
+async function getCustomer(id: number): Promise<CustomerEntity | null> {
+    let pool: ConnectionPool | undefined;
+
+    pool = await sql.connect(conf);
+
+    const result = await pool.request()
+        .input('id', BigInt, id)
+        .query(`
+            SELECT id, firstName, lastName, country, rowVersion
+                FROM Customer
+                WHERE id = @id`);
+
+    if(result.recordset.length === 0) {
+        return null;
+    }
+
+    const row = result.recordset[0];
+
+    return {
+        id: row.id,
+        firstName: row.firstName,
+        lastName: row.lastName,
+        country: row.country,
+        rowVersion: row.rowVersion,
+    };
 }
 
 async function createCustomer(dto: CustomerDto): Promise<void> {
@@ -34,7 +64,7 @@ async function createCustomer(dto: CustomerDto): Promise<void> {
         r.input('lastName', NVarChar(100), entity.lastName);
         r.input('country', NVarChar(50), entity.country);
 
-        const result = await r.query(`
+        const result: IResult<any> = await r.query(`
             INSERT INTO Customer(firstName, lastName, country)
             VALUES(@firstName, @lastName, @country)`);
 
@@ -82,7 +112,7 @@ async function updateCustomer(id: number, dto: CustomerDto): Promise<void> {
         r.input('country', NVarChar(50), entity.country);
         r.input('rowVersion', BigInt, entity.rowVersion);
 
-        const result = await r.query(`
+        const result: IResult<any> = await r.query(`
             UPDATE Customer
                 SET firstName = @firstName,
                     lastName = @lastName,
@@ -113,4 +143,4 @@ async function updateCustomer(id: number, dto: CustomerDto): Promise<void> {
     }
 }
 
-export { createCustomer, updateCustomer }
+export { getCustomer, createCustomer, updateCustomer }
