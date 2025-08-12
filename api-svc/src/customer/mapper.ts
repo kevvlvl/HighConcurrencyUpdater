@@ -1,5 +1,5 @@
-import {CustomerEntity} from "./customerEntity";
-import {Country, CustomerDto} from "./customerDto";
+import {CustomerEntity} from "./interfaces";
+import {Country, CustomerDto} from "./interfaces";
 
 function mapCustomerEntityToDto(entity: CustomerEntity): CustomerDto {
     return {

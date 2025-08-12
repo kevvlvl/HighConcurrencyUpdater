@@ -3,9 +3,10 @@ import sql, {
     IResult
 } from 'mssql';
 
-import {CustomerDto} from "./customerDto";
-import {CustomerEntity} from "./customerEntity";
-import {mapCustomerDtoToEntity} from "./customerMapper";
+import {CustomerDto} from "./interfaces";
+import {CustomerEntity} from "./interfaces";
+import {mapCustomerDtoToEntity} from "./mapper";
+import {RepositoryError} from "./interfaces";
 
 const conf: SqlConfig = {
     user: process.env.DB_USER,
@@ -122,14 +123,11 @@ async function updateCustomer(id: number, dto: CustomerDto): Promise<void> {
                     AND rowVersion = @rowVersion`);
 
         if (result.rowsAffected[0] === 0) {
-            throw {
-                code: 'OPTIMISTIC_LOCKING_ERR',
-                message: 'Customer not found due to version mismatch'
-            }
+            throw getOptimisticLockingError()
         }
 
         await transaction.commit();
-    } catch(err) {
+    } catch(err: any) {
 
         if(transaction) {
             try {
@@ -139,7 +137,19 @@ async function updateCustomer(id: number, dto: CustomerDto): Promise<void> {
             }
         }
 
+        if(err.code === "EREQUEST"
+            && err.message.includes("Snapshot isolation transaction aborted due to update conflict.")) {
+            throw getOptimisticLockingError();
+        }
+
         throw err;
+    }
+}
+
+function getOptimisticLockingError(): RepositoryError {
+    return {
+        code: 'OPTIMISTIC_LOCKING_ERR',
+        message: 'Customer not found due to version mismatch'
     }
 }
 

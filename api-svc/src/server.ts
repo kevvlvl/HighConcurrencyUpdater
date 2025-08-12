@@ -1,8 +1,8 @@
 import express, {Express, Request, Response} from 'express';
-import {createCustomer, getCustomer, updateCustomer} from "./customer/customerRepository";
-import {CustomerDto} from "./customer/customerDto";
-import {CustomerEntity} from "./customer/customerEntity";
-import {mapCustomerEntityToDto} from "./customer/customerMapper";
+import {createCustomer, getCustomer, updateCustomer} from "./customer/repository";
+import {CustomerDto} from "./customer/interfaces";
+import {CustomerEntity} from "./customer/interfaces";
+import {mapCustomerEntityToDto} from "./customer/mapper";
 
 console.log('Happy developing ✨')
 
@@ -26,17 +26,10 @@ server.get('/api/customer/:id', async (req: Request<{ id: number }>, res: Respon
 
         console.log(err);
 
-        if(err.code == 'UPDATE_CONFLICT') {
-            res.status(409).json({
-                error: 'Optimistic Locking',
-                details: 'version mismatch for the requested customer ID'
-            })
-        } else {
-            res.status(500).json({
-                error: 'Internal Server Error',
-                details: err.message
-            })
-        }
+        res.status(500).json({
+            error: 'Internal Server Error',
+            details: err.message
+        })
     }
 })
 
@@ -70,10 +63,10 @@ server.put('/api/customer/:id', async (req: Request<{ id: number }>, res: Respon
 
         console.log(err);
 
-        if(err.code == 'UPDATE_CONFLICT') {
+        if(err.code == 'OPTIMISTIC_LOCKING_ERR') {
             res.status(409).json({
                 error: 'Optimistic Locking',
-                details: 'version mismatch for the requested customer ID'
+                details: err.message
             })
         } else {
             res.status(500).json({
